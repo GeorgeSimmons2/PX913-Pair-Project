@@ -63,8 +63,15 @@ MODULE grid_initialisation
 
             ! Loops over the grid and sets the correct 
             ! charge distribution. Omitts the ghost cells. i.e
-            ! 0 and nx + 1 (similarly for y).
-            DO i=1,nx
+            ! 0 and nx + 1 (similarly for y). Loops from the top to bottom to 
+            ! correctly, such that it uses the same convention as in the notes. 
+            ! i.e the origin of the grid is in the bottom left, as per te he top
+            ! left
+
+
+            ! TODO: Set the input of the Gaussian using literals maybe.
+            ! TODO: Make sure that the looping is correct.
+            DO i=nx,1,-1
                 DO j=1,ny
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
@@ -73,10 +80,23 @@ MODULE grid_initialisation
                     rho(i,j) = Gaussian(x,y,mean_x,mean_y,std)
                 END DO
             END DO
+        
+        ELSE IF (problem == 'double') THEN
+            ! Uses the same looping convention as above. 
+            ! This time the paramaters are set directly in the function call 
+            ! to stop from creating more variables.
+ 
+            DO i=nx,1,-1
+                DO j=1,ny
+                    pos = position_converter(x_axis,y_axis,i,j)
+                    x = pos(1)
+                    y = pos(2)
+                    rho(i,j) = Gaussian(x,y,mean_x = 0.25_REAL64,mean_y = 0.25_REAL64,std = 0.1_REAL64) & 
+                     + Gaussian(x,y,mean_x = -0.75_REAL64, mean_y = -0.75_REAL64, std = 0.2_REAL64)
+                END DO
+            END DO
         END IF 
 
-                    
-        
     END SUBROUTINE
     
     ! Converts the grid (i,j) coordinates to the physical 
@@ -148,7 +168,7 @@ PROGRAM Solver
     ! Prints the charge distribution, depending on the user 
     ! input 'problem'
     
-    PRINT*,rho
+    PRINT*,rho(4,:)
 
 
 END PROGRAM
