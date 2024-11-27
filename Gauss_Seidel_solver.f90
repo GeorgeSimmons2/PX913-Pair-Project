@@ -10,13 +10,13 @@ MODULE grid_initialisation
     ! rho. The charge distribution values are defined as being in the 
     ! centre of the grid squares, as in the notes provided.
 
-    SUBROUTINE define_rho(rho, nx,ny,problem)
+    SUBROUTINE define_rho(rho,nx,ny,problem,dx,dy)
         REAL(REAL64), DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: rho
         REAL(REAL64),DIMENSION(:),ALLOCATABLE :: x_axis,y_axis
 
         REAL(REAL64),DIMENSION(2) :: axis_range
         
-        REAL(REAL64) :: dx,dy
+        REAL(REAL64),INTENT(OUT) :: dx,dy
         INTEGER(INT64) :: x_dim,y_dim, i,j
         
         
@@ -99,6 +99,41 @@ MODULE grid_initialisation
 
     END SUBROUTINE
     
+    SUBROUTINE calc_potential(rho,phi,dx,dy)
+        REAL(REAL64),DIMENSION(:,:), ALLOCATABLE, INTENT(IN) :: rho
+        REAL(REAL64),DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: phi
+        
+        REAL(REAL64), INTENT(IN) :: dx,dy
+        INTEGER(INT64) :: i,j ,nx,ny
+        
+        LOGICAL :: loop_flag
+
+        loop_flag = .TRUE.
+        
+        
+        
+        ! Need the -2 to account for the 2 ghost cells on each side of the grid.
+        
+        
+        nx = SIZE(rho(:,1)) -2
+        ny = SIZE(rho(1,:)) -2 
+
+        ALLOCATE(phi(0:nx + 1,0:ny + 1))
+
+
+        DO WHILE (loop_flag)
+            DO i=1,nx
+                DO j=1,ny
+                    phi(i,j) =  -rho(i,j) + (phi(i+1,j) + phi(i-1,j))/(dx**2) + (phi(i,j+1) + phi(i,j-1))/(dy**2)
+                    phi(i,j) = phi(i,j)/( 2/(dx**2) + 2/(dy**2))
+                
+                END DO
+            END DO
+            
+            loop_flag = .FALSE.
+        END DO
+    END SUBROUTINE
+        
     ! Converts the grid (i,j) coordinates to the physical 
     ! (x,y) coordinates, given the x and y axes. i runs from 
     ! (1,nx) and j runs from (1,ny). Returns (x,y)
@@ -133,7 +168,6 @@ MODULE grid_initialisation
     END FUNCTION
 
 
-
 END MODULE
 
 
@@ -147,8 +181,9 @@ PROGRAM Solver
     IMPLICIT NONE
 
     REAL(REAL64),DIMENSION(:,:), ALLOCATABLE :: rho
-
+    REAL(REAL64),DIMENSION(:,:), ALLOCATABLE :: phi
     INTEGER :: nx,ny
+    REAL(REAL64) :: dx,dy
     CHARACTER(LEN=10) :: problem
     LOGICAL :: arg
 
@@ -163,12 +198,13 @@ PROGRAM Solver
     arg = get_arg('problem',problem)
 
 
-    CALL define_rho(rho,nx,ny,problem)
+    CALL define_rho(rho,nx,ny,problem,dx,dy)
+    CALL calc_potential(rho,phi,dx,dy)
     
     ! Prints the charge distribution, depending on the user 
     ! input 'problem'
     
-    PRINT*,rho(4,:)
+    !PRINT*,rho(4,:)
 
 
 END PROGRAM
