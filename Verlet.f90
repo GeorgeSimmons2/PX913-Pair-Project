@@ -21,8 +21,7 @@ MODULE VERLET_MOD
         INTEGER(INT64) :: n_x, n_y, x_cell, y_cell, steps, i, j
         INTENT(IN) :: steps, n_x, n_y
         REAL(REAL64), INTENT(IN) :: dx, dy, dt
-        REAL(REAL64), DIMENSION(n_x, n_y) :: E_x, E_y
-        REAL(REAL64), DIMENSION(n_x + 2, n_y + 2), INTENT(IN) :: gauss_seidel !(n_x+2)x(n_y+2) array of potentials (ghost nodes on boundaries)
+        REAL(REAL64), DIMENSION(0:n_x+1, 0:n_y+1), INTENT(IN) :: gauss_seidel !(n_x+2)x(n_y+2) array of potentials (ghost nodes on boundaries)
         REAL(REAL64), DIMENSION(2), INTENT(IN) :: r_init, v_init
         TYPE(trajectory) :: particle_traj
         
@@ -38,8 +37,8 @@ MODULE VERLET_MOD
         particle_traj%vy_traj(0) = v_init(2)
         ALLOCATE(particle_traj%ax_traj(0:steps))
         ALLOCATE(particle_traj%ay_traj(0:steps))
-        ALLOCATE(particle_traj%E_x(n_x, n_y))
-        ALLOCATE(particle_traj%E_y(n_x, n_y))
+        ALLOCATE(particle_traj%E_x(1:n_x, n_y:1)) !n_y:1 because we want y idecreasing as we go down array
+        ALLOCATE(particle_traj%E_y(1:n_x, n_y:1))
 
         !Obtaining the electric field so we can calculate accelerations
         DO i = 1, n_x
@@ -56,11 +55,27 @@ MODULE VERLET_MOD
         particle_traj%ay_traj(0) = - 1. * particle_traj%E_y(x_cell, y_cell)
         
         !Verlet algorithm
-        
-
+        DO i = 2, steps
+            particle_traj%x_traj(i) = particle_traj%x_traj(i - 1) + particle_traj%vx_traj(i - 1) * dt &
+                                      + 0.5 * particle_traj%ax_traj(i - 1) * dt ** 2
+            particle_traj%y_traj(i) = particle_traj%y_traj(i - 1) + particle_traj%vy_traj(i - 1) * dt &
+                                      + 0.5 * particle_traj%ay_traj(i - 1) * dt ** 2
+            x_cell = FLOOR((particle_traj%x_traj(i) - 1.0) / dx) + 1
+            y_cell = FLOOR((particle_traj%y_traj(i) - 1.0) / dy) + 1
+            particle_traj%ax_traj(i) = -1. * particle_traj%E_x(x_cell, y_cell)
+            particle_traj%ay_traj(i) = -1. * particle_traj%E_y(x_cell, y_cell)
+            particle_traj%vx_traj(i) = particle_traj%vx_traj(i - 1) + dt * (particle_traj%ax_traj(i) &
+                                       + particle_traj%ax_traj(i - 1)) / 2
+            particle_traj%vy_traj(i) = particle_traj%vy_traj(i - 1) + dt * (particle_traj%ay_traj(i) &
+                                       + particle_traj%ay_traj(i - 1)) / 2
+        END DO        
 
     END FUNCTION VERLET
 
 
 
 END MODULE VERLET_MOD
+
+PROGRAM main
+    USE VERLET_MOD
+END PROGRAM main
