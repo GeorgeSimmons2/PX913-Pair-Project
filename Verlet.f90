@@ -7,10 +7,11 @@ MODULE VERLET_MOD
     
     
     !Type used to pass all trajectories of position, velocity, accelerations, and E-field as the return 
-    !argument of verlet function
-    TYPE :: trajectory
-        REAL(REAL64), DIMENSION(:), ALLOCATABLE :: x_traj, y_traj, vx_traj, vy_traj, ax_traj, ay_traj
-        REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: E_x, E_y
+    !argument of verlet function. We also want names for when we define these variables in the netCDF writer
+    TYPE :: TRAJECTORY
+        REAL(REAL64), DIMENSION(:), ALLOCATABLE     :: x_traj, y_traj, vx_traj, vy_traj, ax_traj, ay_traj
+        REAL(REAL64), DIMENSION(:, :), ALLOCATABLE  :: E_x, E_y
+        CHARACTER(LEN=30)                           :: x_name, y_name, vx_name, vy_name, ax_name, ay_name, Ex_name, Ey_name
     END TYPE
 
     CONTAINS
@@ -23,7 +24,7 @@ MODULE VERLET_MOD
         REAL(REAL64), INTENT(IN) :: dx, dy, dt
         REAL(REAL64), DIMENSION(0:n_x+1, 0:n_y+1), INTENT(IN) :: gauss_seidel !(n_x+2)x(n_y+2) array of potentials (ghost nodes on boundaries)
         REAL(REAL64), DIMENSION(2), INTENT(IN) :: r_init, v_init
-        TYPE(trajectory) :: particle_traj
+        TYPE(TRAJECTORY) :: particle_traj
         
         !Allocate and initialise the trajectories with the initial conditions
         !(we will initialise acceleration after calculating the E-field)
@@ -76,6 +77,6 @@ MODULE VERLET_MOD
 
 END MODULE VERLET_MOD
 
-PROGRAM main
+PROGRAM MAIN
     USE VERLET_MOD
-END PROGRAM main
+END PROGRAM MAIN
