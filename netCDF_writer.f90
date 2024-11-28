@@ -10,7 +10,8 @@ MODULE NETCDF_WRITER
     
     SUBROUTINE WRITER(particle_traj, filename, ierr)
         TYPE(trajectory), INTENT(IN) :: particle_traj !Easiest to use derived type for all trajectories
-        INTEGER(INT64), INTENT(IN) :: ierr, file_id
+        INTEGER(INT64) :: ierr, file_id
+        INTENT(OUT) :: ierr
         CHARACTER(LEN=*), INTENT(IN) :: filename
 
 
@@ -18,6 +19,7 @@ MODULE NETCDF_WRITER
         PRINT *, ierr
 
         !Insert all information about file here
+        ierr = nf90_def_dim(file_id, )
 
         ierr = nf90_close(file_id)
         PRINT *, ierr
