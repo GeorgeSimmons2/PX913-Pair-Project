@@ -10,8 +10,9 @@ MODULE VERLET_MOD
     !argument of verlet function. We also want names for when we define these variables in the netCDF writer
     TYPE :: TRAJECTORY
         REAL(REAL64), DIMENSION(:), ALLOCATABLE     :: x_traj, y_traj, vx_traj, vy_traj, ax_traj, ay_traj
-        REAL(REAL64), DIMENSION(:, :), ALLOCATABLE  :: E_x, E_y
-        CHARACTER(LEN=30)                           :: x_name, y_name, vx_name, vy_name, ax_name, ay_name, Ex_name, Ey_name
+        REAL(REAL64), DIMENSION(:, :), ALLOCATABLE  :: E_x, E_y, rho, phi
+        CHARACTER(LEN=30)                           :: x_name, y_name, vx_name, vy_name, ax_name, ay_name, Ex_name, Ey_name, &
+                                                       rho_name, phi_name
     END TYPE
 
     CONTAINS

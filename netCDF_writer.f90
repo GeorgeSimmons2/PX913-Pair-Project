@@ -13,7 +13,7 @@ MODULE NETCDF_WRITER
 
     CONTAINS
     
-    SUBROUTINE WRITER(particle_traj, filename, dims, ierr)
+    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr)
         TYPE(DIMENSIONS), INTENT(IN)                 :: dims
         TYPE(TRAJECTORY), INTENT(IN)                 :: particle_traj !Easiest to use derived type for all trajectories
         INTEGER(INT64)                               :: ierr, file_id
@@ -32,6 +32,8 @@ MODULE NETCDF_WRITER
         ALLOCATE(particle_traj%ay_traj(0:dims%steps))
         ALLOCATE(particle_traj%E_x(1:dims%n_x, dims%n_y:1)) !n_y:1 because we want y idecreasing as we go down array
         ALLOCATE(particle_traj%E_y(1:dims%n_x, dims%n_y:1))
+        ALLOCATE(particle_traj%rho(1:dims%n_x, dims%n_y:1))
+        ALLOCATE(particle_traj%phi(1:dims%n_x, dims%n_y:1))
 
 
         ierr = nf90_create(filename, NF90_CLOBBER, file_id)
@@ -73,14 +75,17 @@ MODULE NETCDF_WRITER
         ierr = nf90_def_var(file_id, particle_traj%ay_traj, NF90_REAL, dimension_ids(3), variable_ids(8))
         PRINT *, ierr
 
-        !These two remaining variables are for charge density and scalar potential
-        !ierr = nf90_def_var(file_id, NAME, NF90_REAL, dimension_ids(1:2), variable_ids(9))
-        !PRINT *, ierr
+        These two remaining variables are for charge density and scalar potential
+        ierr = nf90_def_var(file_id, particle_traj%rho_name, NF90_REAL, dimension_ids(1:2), variable_ids(9))
+        PRINT *, ierr
 
-        !ierr = nf90_def_var(file_id, NAME, NF90_REAL, dimension_ids(1:2), variable_ids(10))
-        !PRINT *, ierr
+        ierr = nf90_def_var(file_id, particle_traj%phi_name, NF90_REAL, dimension_ids(1:2), variable_ids(10))
+        PRINT *, ierr
 
+        !Also add attributes to variables/global
 
+        ierr = nf90_end_def(file_id)
+        PRINT *, ierr
 
         ierr = nf90_close(file_id)
         PRINT *, ierr
