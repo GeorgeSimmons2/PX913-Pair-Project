@@ -30,10 +30,10 @@ MODULE NETCDF_WRITER
         ALLOCATE(particle_traj%vy_traj(0:dims%steps))
         ALLOCATE(particle_traj%ax_traj(0:dims%steps))
         ALLOCATE(particle_traj%ay_traj(0:dims%steps))
-        ALLOCATE(particle_traj%E_x(1:dims%n_x, dims%n_y:1)) !n_y:1 because we want y idecreasing as we go down array
-        ALLOCATE(particle_traj%E_y(1:dims%n_x, dims%n_y:1))
-        ALLOCATE(particle_traj%rho(1:dims%n_x, dims%n_y:1))
-        ALLOCATE(particle_traj%phi(1:dims%n_x, dims%n_y:1))
+        ALLOCATE(particle_traj%E_x(1:dims%n_x, 1:dims%n_y)) !n_y:1 because we want y idecreasing as we go down array
+        ALLOCATE(particle_traj%E_y(1:dims%n_x, 1:dims%n_y))
+        ALLOCATE(particle_traj%rho(1:dims%n_x, 1:dims%n_y))
+        ALLOCATE(particle_traj%phi(1:dims%n_x, 1:dims%n_y))
 
 
         ierr = nf90_create(filename, NF90_CLOBBER, file_id)

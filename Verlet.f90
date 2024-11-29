@@ -39,8 +39,8 @@ MODULE VERLET_MOD
         particle_traj%vy_traj(0) = v_init(2)
         ALLOCATE(particle_traj%ax_traj(0:steps))
         ALLOCATE(particle_traj%ay_traj(0:steps))
-        ALLOCATE(particle_traj%E_x(1:n_x, n_y:1)) !n_y:1 because we want y idecreasing as we go down array
-        ALLOCATE(particle_traj%E_y(1:n_x, n_y:1))
+        ALLOCATE(particle_traj%E_x(1:n_x, 1:n_y)) !n_y:1 because we want y idecreasing as we go down array
+        ALLOCATE(particle_traj%E_y(1:n_x, 1:n_y))
 
         !Obtaining the electric field so we can calculate accelerations
         DO i = 1, n_x
@@ -70,7 +70,7 @@ MODULE VERLET_MOD
                                        + particle_traj%ax_traj(i - 1)) / 2
             particle_traj%vy_traj(i) = particle_traj%vy_traj(i - 1) + dt * (particle_traj%ay_traj(i) &
                                        + particle_traj%ay_traj(i - 1)) / 2
-        END DO        
+        END DO
 
     END FUNCTION VERLET
 
