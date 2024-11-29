@@ -57,25 +57,24 @@ MODULE NETCDF_WRITER
         ierr = nf90_def_var(file_id, particle_traj%Ey_name, NF90_REAL, dimension_ids(1:2), variable_ids(2))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%x_traj, NF90_REAL, dimension_ids(3), variable_ids(3))
+        ierr = nf90_def_var(file_id, particle_traj%x_name, NF90_REAL, dimension_ids(3), variable_ids(3))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%y_traj, NF90_REAL, dimension_ids(3), variable_ids(4))
+        ierr = nf90_def_var(file_id, particle_traj%y_name, NF90_REAL, dimension_ids(3), variable_ids(4))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%vx_traj, NF90_REAL, dimension_ids(3), variable_ids(5))
+        ierr = nf90_def_var(file_id, particle_traj%vx_name, NF90_REAL, dimension_ids(3), variable_ids(5))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%vy_traj, NF90_REAL, dimension_ids(3), variable_ids(6))
+        ierr = nf90_def_var(file_id, particle_traj%vy_name, NF90_REAL, dimension_ids(3), variable_ids(6))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%ax_traj, NF90_REAL, dimension_ids(3), variable_ids(7))
+        ierr = nf90_def_var(file_id, particle_traj%ax_name, NF90_REAL, dimension_ids(3), variable_ids(7))
         PRINT *, ierr
 
-        ierr = nf90_def_var(file_id, particle_traj%ay_traj, NF90_REAL, dimension_ids(3), variable_ids(8))
+        ierr = nf90_def_var(file_id, particle_traj%ay_name, NF90_REAL, dimension_ids(3), variable_ids(8))
         PRINT *, ierr
 
-        These two remaining variables are for charge density and scalar potential
         ierr = nf90_def_var(file_id, particle_traj%rho_name, NF90_REAL, dimension_ids(1:2), variable_ids(9))
         PRINT *, ierr
 
@@ -85,6 +84,38 @@ MODULE NETCDF_WRITER
         !Also add attributes to variables/global
 
         ierr = nf90_end_def(file_id)
+        PRINT *, ierr
+
+        !We need to put all our data into the variables we defined now
+        !All output data is containted within the derived type "trajectory"
+        ierr = nf90_put_var(file_id, variable_ids(1), particle_traj%E_x)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(2), particle_traj%E_y)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(3), particle_traj%x_traj)
+        PRINT *, ierr
+        
+        ierr = nf90_put_var(file_id, variable_ids(4), particle_traj%y_traj)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(5), particle_traj%vx_traj)
+        PRINT *, ierr
+        
+        ierr = nf90_put_var(file_id, variable_ids(6), particle_traj%vy_traj)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(7), particle_traj%ax_traj)
+        PRINT *, ierr
+        
+        ierr = nf90_put_var(file_id, variable_ids(8), particle_traj%ay_traj)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(9), particle_traj%rho)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(10), particle_traj%phi)
         PRINT *, ierr
 
         ierr = nf90_close(file_id)
