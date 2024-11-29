@@ -51,7 +51,7 @@ MODULE VERLET_MOD
         END DO
 
         !Initialise acceleration now using cell corresponding to E-field cell we are starting in
-        x_cell = FLOOR((r_init(1) - 1.0) / dx) + 1
+        x_cell = FLOOR((r_init(1) - 1.0) / dx) + 1 !This equation and future uses are from the briefing sheet (credit to C Brady & H Ratcliffe)
         y_cell = FLOOR((r_init(2) - 1.0) / dy) + 1
         particle_traj%ax_traj(0) = - 1. * particle_traj%E_x(x_cell, y_cell)
         particle_traj%ay_traj(0) = - 1. * particle_traj%E_y(x_cell, y_cell)
