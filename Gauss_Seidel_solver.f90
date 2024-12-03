@@ -124,9 +124,9 @@ MODULE grid_initialisation
         
         
         phi(0:nx +1,0:ny + 1) = 0.0_REAL64
-        !phi(0,0:ny + 1) = 1.0_REAL64
-    
-        
+
+
+
         !phi(1:nx,1:ny)  = 1.0_REAL64
         
         counter = 0
@@ -150,7 +150,7 @@ MODULE grid_initialisation
             IF (error < 10E-5) THEN
                
                 loop_flag = .FALSE.
-                PRINT*,counter
+                PRINT '(A," ",G0," ",A)',' The algorithm took', counter, 'iterations to converge'
             END IF
            
             
@@ -280,7 +280,7 @@ PROGRAM Solver
     ! input 'problem'
     
     !PRINT*,rho(4,:)
-    PRINT*,phi
+    
     OPEN(fu,action = 'write',file = OUT_FILE,status = 'replace')
 
     DO j=ny,1,-1
