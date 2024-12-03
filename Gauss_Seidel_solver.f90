@@ -71,8 +71,8 @@ MODULE grid_initialisation
 
             ! TODO: Set the input of the Gaussian using literals maybe.
             ! TODO: Make sure that the looping is correct.
-            DO i=1,nx
-                DO j=1,ny
+            DO j=ny,1,-1
+                DO i=1,nx
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
                     y = pos(2)
@@ -86,8 +86,8 @@ MODULE grid_initialisation
             ! This time the paramaters are set directly in the function call 
             ! to stop from creating more variables.
  
-            DO i=1,nx
-                DO j=1,ny
+              DO j=ny,1,-1
+                DO i=1,nx
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
                     y = pos(2)
@@ -132,8 +132,8 @@ MODULE grid_initialisation
         counter = 0
         DO WHILE (loop_flag)
            
-            DO i=1,nx
-                DO j=1,ny
+              DO j=ny,1,-1
+                DO i=1,nx
                     dphi_x = (phi(i+1,j) + phi(i-1,j))/(dx**2)
                     dphi_y = (phi(i,j+1) + phi(i,j-1))/(dy**2)
                     
@@ -207,8 +207,8 @@ MODULE grid_initialisation
         error_rms = 0.0
       
 
-        DO i=1,nx
-            DO j=1,ny
+        DO j=ny,1,-1
+            DO i=1,nx
                 error_tot = error_tot + ABS( -rho(i,j) & 
                 + (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2)  & 
                 + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))
@@ -216,8 +216,8 @@ MODULE grid_initialisation
             END DO
         END DO
    
-        DO i=1,nx
-            DO j = 1,ny
+        DO j = ny,1,-1
+            DO i=1,nx
                 error_rms = error_rms + ( (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2) &
                 + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))**2
              
@@ -227,9 +227,7 @@ MODULE grid_initialisation
 
         ! Either error, may be 0. This is the case when there is no charge denisty,
         ! and the second derivatives of the potential dissappear. However, there still is 
-        ! a potential.
-
-          
+        ! a potential. 
       
 
         IF (error_rms <10E-14) THEN 
@@ -285,10 +283,10 @@ PROGRAM Solver
     PRINT*,phi
     OPEN(fu,action = 'write',file = OUT_FILE,status = 'replace')
 
-    DO i=1,nx
-        DO j=1,ny
+    DO j=ny,1,-1
+        DO i=1,nx
             WRITE(fu,'(F10.5)',ADVANCE = 'NO') phi(i,j)
-            IF (j < ny) THEN
+            IF (i < nx) THEN
                 WRITE(fu, '(A)', ADVANCE='NO') ','
             END IF
         END DO
