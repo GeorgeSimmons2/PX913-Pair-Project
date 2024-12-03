@@ -71,7 +71,7 @@ MODULE grid_initialisation
 
             ! TODO: Set the input of the Gaussian using literals maybe.
             ! TODO: Make sure that the looping is correct.
-            DO i=nx,1,-1
+            DO i=1,nx
                 DO j=1,ny
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
@@ -86,7 +86,7 @@ MODULE grid_initialisation
             ! This time the paramaters are set directly in the function call 
             ! to stop from creating more variables.
  
-            DO i=nx,1,-1
+            DO i=1,nx
                 DO j=1,ny
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
@@ -101,36 +101,59 @@ MODULE grid_initialisation
     
     SUBROUTINE calc_potential(rho,phi,dx,dy)
         REAL(REAL64),DIMENSION(:,:), ALLOCATABLE, INTENT(IN) :: rho
-        REAL(REAL64),DIMENSION(:,:), ALLOCATABLE, INTENT(OUT) :: phi
+        REAL(REAL64),DIMENSION(:,:), ALLOCATABLE,INTENT(INOUT) :: phi
         
         REAL(REAL64), INTENT(IN) :: dx,dy
-        INTEGER(INT64) :: i,j ,nx,ny
+        INTEGER(INT64) :: i,j ,nx,ny,counter
         
+        REAL(REAL64) :: error,factor,dphi_x,dphi_y
+
         LOGICAL :: loop_flag
 
         loop_flag = .TRUE.
         
-        
+        error = 0.0
         
         ! Need the -2 to account for the 2 ghost cells on each side of the grid.
         
-        
+       
         nx = SIZE(rho(:,1)) -2
         ny = SIZE(rho(1,:)) -2 
 
         ALLOCATE(phi(0:nx + 1,0:ny + 1))
-
-
+        
+        
+        phi(0:nx +1,0:ny + 1) = 0.0_REAL64
+        !phi(0,0:ny + 1) = 1.0_REAL64
+    
+        
+        !phi(1:nx,1:ny)  = 1.0_REAL64
+        
+        counter = 0
         DO WHILE (loop_flag)
+           
             DO i=1,nx
                 DO j=1,ny
-                    phi(i,j) =  -rho(i,j) + (phi(i+1,j) + phi(i-1,j))/(dx**2) + (phi(i,j+1) + phi(i,j-1))/(dy**2)
-                    phi(i,j) = phi(i,j)/( 2/(dx**2) + 2/(dy**2))
-                
+                    dphi_x = (phi(i+1,j) + phi(i-1,j))/(dx**2)
+                    dphi_y = (phi(i,j+1) + phi(i,j-1))/(dy**2)
+                    
+                    phi(i,j) = (-rho(i,j) + dphi_x + dphi_y)/( 2.0_REAL64/(dx**2) + 2.0_REAL64/(dy**2))
+
                 END DO
             END DO
+           
+            error = calc_error(rho,phi,dx,dy)
             
-            loop_flag = .FALSE.
+            counter = counter + 1
+            !PRINT*,phi
+            !PRINT*,error
+            IF (error < 10E-5) THEN
+               
+                loop_flag = .FALSE.
+                PRINT*,counter
+            END IF
+           
+            
         END DO
     END SUBROUTINE
         
@@ -167,7 +190,57 @@ MODULE grid_initialisation
         Gaussian = EXP(-( (x + mean_x)/std ) ** 2 - ( (y + mean_y)/std ) ** 2 )
     END FUNCTION
 
+    FUNCTION calc_error(rho,phi,dx,dy)
+        REAL(REAL64) :: calc_error
+        REAL(REAL64),DIMENSION(:,:),ALLOCATABLE, INTENT(IN) :: rho,phi
+        INTEGER(INT64) :: i,j,nx,ny
+        REAL(REAL64), INTENT(IN) :: dx,dy
+        REAL(REAL64) :: error_tot, error_rms
 
+
+
+
+        nx = SIZE(rho(:,1)) -2
+        ny = SIZE(rho(1,:)) -2
+        
+        error_tot = 0.0
+        error_rms = 0.0
+      
+
+        DO i=1,nx
+            DO j=1,ny
+                error_tot = error_tot + ABS( -rho(i,j) & 
+                + (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2)  & 
+                + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))
+                
+            END DO
+        END DO
+   
+        DO i=1,nx
+            DO j = 1,ny
+                error_rms = error_rms + ( (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2) &
+                + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))**2
+             
+            END DO
+        END DO
+        
+
+        ! Either error, may be 0. This is the case when there is no charge denisty,
+        ! and the second derivatives of the potential dissappear. However, there still is 
+        ! a potential.
+
+          
+      
+
+        IF (error_rms <10E-14) THEN 
+            error_rms = 1.0
+        END IF
+
+
+        error_rms = SQRT(error_rms/(nx * ny))
+     
+        calc_error = error_tot/error_rms
+    END FUNCTION
 END MODULE
 
 
@@ -182,11 +255,14 @@ PROGRAM Solver
 
     REAL(REAL64),DIMENSION(:,:), ALLOCATABLE :: rho
     REAL(REAL64),DIMENSION(:,:), ALLOCATABLE :: phi
-    INTEGER :: nx,ny
+    INTEGER :: nx,ny,i,fu,j
     REAL(REAL64) :: dx,dy
     CHARACTER(LEN=10) :: problem
     LOGICAL :: arg
 
+    CHARACTER(LEN=*),PARAMETER :: OUT_FILE = 'potential.csv'
+    
+        
     ! TODO: Check user input. Allocate exact string length for problem.
     
     CALL  parse_args
@@ -197,6 +273,7 @@ PROGRAM Solver
     arg = get_arg('ny',ny)
     arg = get_arg('problem',problem)
 
+    fu = 50
 
     CALL define_rho(rho,nx,ny,problem,dx,dy)
     CALL calc_potential(rho,phi,dx,dy)
@@ -205,7 +282,22 @@ PROGRAM Solver
     ! input 'problem'
     
     !PRINT*,rho(4,:)
+    PRINT*,phi
+    OPEN(fu,action = 'write',file = OUT_FILE,status = 'replace')
 
+    DO i=1,nx
+        DO j=1,ny
+            WRITE(fu,'(F10.5)',ADVANCE = 'NO') phi(i,j)
+            IF (j < ny) THEN
+                WRITE(fu, '(A)', ADVANCE='NO') ','
+            END IF
+        END DO
+        WRITE(fu,*)
+    END DO
+        
+      
+
+    CLOSE(fu)
 
 END PROGRAM
 
