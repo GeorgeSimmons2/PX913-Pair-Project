@@ -7,34 +7,36 @@ MODULE NETCDF_WRITER
     IMPLICIT NONE
     
     TYPE :: DIMENSIONS
-        INTEGER(INT64)   :: n_x, n_y, steps
-        CHARACTER(LEN=*) :: n_x_name, n_y_name, steps_name !These are just to give appropriate names to each dimension
+        INTEGER(INT32)   :: n_x, n_y, steps
+        CHARACTER(LEN=30) :: n_x_name, n_y_name, steps_name !These are just to give appropriate names to each dimension
     END TYPE
 
     CONTAINS
     
-    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr)
-        TYPE(DIMENSIONS), INTENT(IN)                 :: dims
-        TYPE(TRAJECTORY), INTENT(IN)                 :: particle_traj !Easiest to use derived type for all trajectories
-        INTEGER(INT64)                               :: ierr, file_id
-        INTEGER(INT64), DIMENSION(:), ALLOCATABLE    :: dimension_ids, variable_ids
-        INTENT(OUT)                                  :: ierr
-        CHARACTER(LEN=*), INTENT(IN)                 :: filename
+    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, N)
+        TYPE(DIMENSIONS), INTENT(INOUT)                 :: dims
+        TYPE(TRAJECTORY), INTENT(INOUT)                 :: particle_traj !Easiest to use derived type for all trajectories
+        INTEGER(INT32)                                  :: file_id
+        INTEGER(INT32), DIMENSION(:), ALLOCATABLE       :: dimension_ids, variable_ids
+        REAL(REAL64), DIMENSION(:, :), ALLOCATABLE      :: rho, phi, rho_corrected, phi_corrected
+        INTENT(INOUT)                                   :: rho, phi
+        INTEGER(INT64), INTENT(OUT)                     :: ierr
+        CHARACTER(LEN=*), INTENT(IN)                    :: filename
+        INTEGER(INT64)                                  :: i, j, N
+
+        ALLOCATE(rho_corrected(N, N))
+        ALLOCATE(phi_corrected(N, N))
+
+        DO i = 2, N-1
+            DO j = 2, N-1
+                rho_corrected(i, j) = rho(i, j)
+                phi_corrected(i, j) = phi(i, j)
+            END DO
+        END DO
 
         !We are allocating for storing each id number of the variables and dimensions we have
         ALLOCATE(dimension_ids(3))
         ALLOCATE(variable_ids(10))
-        ALLOCATE(particle_traj%x_traj(0:dims%steps))
-        ALLOCATE(particle_traj%y_traj(0:dims%steps))
-        ALLOCATE(particle_traj%vx_traj(0:dims%steps))
-        ALLOCATE(particle_traj%vy_traj(0:dims%steps))
-        ALLOCATE(particle_traj%ax_traj(0:dims%steps))
-        ALLOCATE(particle_traj%ay_traj(0:dims%steps))
-        ALLOCATE(particle_traj%E_x(1:dims%n_x, 1:dims%n_y)) !n_y:1 because we want y idecreasing as we go down array
-        ALLOCATE(particle_traj%E_y(1:dims%n_x, 1:dims%n_y))
-        ALLOCATE(particle_traj%rho(1:dims%n_x, 1:dims%n_y))
-        ALLOCATE(particle_traj%phi(1:dims%n_x, 1:dims%n_y))
-
 
         ierr = nf90_create(filename, NF90_CLOBBER, file_id)
         PRINT *, ierr
@@ -82,8 +84,7 @@ MODULE NETCDF_WRITER
         PRINT *, ierr
 
         !Also add attributes to variables/global
-
-        ierr = nf90_end_def(file_id)
+        ierr = nf90_enddef(file_id)
         PRINT *, ierr
 
         !We need to put all our data into the variables we defined now
@@ -112,10 +113,10 @@ MODULE NETCDF_WRITER
         ierr = nf90_put_var(file_id, variable_ids(8), particle_traj%ay_traj)
         PRINT *, ierr
 
-        ierr = nf90_put_var(file_id, variable_ids(9), particle_traj%rho)
+        ierr = nf90_put_var(file_id, variable_ids(9), rho_corrected)
         PRINT *, ierr
 
-        ierr = nf90_put_var(file_id, variable_ids(10), particle_traj%phi)
+        ierr = nf90_put_var(file_id, variable_ids(10), phi_corrected)
         PRINT *, ierr
 
         ierr = nf90_close(file_id)

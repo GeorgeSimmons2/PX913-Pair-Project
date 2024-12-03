@@ -11,7 +11,7 @@ MODULE VERLET_MOD
     TYPE :: TRAJECTORY
         REAL(REAL64), DIMENSION(:), ALLOCATABLE     :: x_traj, y_traj, vx_traj, vy_traj, ax_traj, ay_traj
         REAL(REAL64), DIMENSION(:, :), ALLOCATABLE  :: E_x, E_y, rho, phi
-        CHARACTER(LEN=30)                           :: x_name, y_name, vx_name, vy_name, ax_name, ay_name, Ex_name, Ey_name, &
+        CHARACTER(LEN=20)                            :: x_name, y_name, vx_name, vy_name, ax_name, ay_name, Ex_name, Ey_name, &
                                                        rho_name, phi_name
     END TYPE
 
@@ -39,12 +39,12 @@ MODULE VERLET_MOD
         particle_traj%vy_traj(0) = v_init(2)
         ALLOCATE(particle_traj%ax_traj(0:steps))
         ALLOCATE(particle_traj%ay_traj(0:steps))
-        ALLOCATE(particle_traj%E_x(1:n_x, 1:n_y)) !n_y:1 because we want y idecreasing as we go down array
-        ALLOCATE(particle_traj%E_y(1:n_x, 1:n_y))
+        ALLOCATE(particle_traj%E_x(1:n_y, 1:n_x)) !n_y:1 because we want y idecreasing as we go down array
+        ALLOCATE(particle_traj%E_y(1:n_y, 1:n_x))
 
         !Obtaining the electric field so we can calculate accelerations
-        DO i = 1, n_x
-            DO j = 1, n_y
+        DO i = 1, n_y
+            DO j = 1, n_x
                 particle_traj%E_x(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j) / (2 * dx))
                 particle_traj%E_y(i, j) = (gauss_seidel(i, j + 1) - gauss_seidel(i, j - 1) / (2 * dy))
             END DO
