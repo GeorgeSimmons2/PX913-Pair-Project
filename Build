@@ -10,7 +10,7 @@ fc=gfortran
 
 echo "Compiling $outfile"
 
-$fc -g -std=f2008 $myprogramfiles -o $outfile
+$fc -g -pg -std=f2008 $myprogramfiles -o $outfile
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Compilation of $outfile failed. Exiting."
@@ -24,7 +24,7 @@ echo "Compilation of $outfile successful."
 echo "Executing $outfile"
 
 
-./$outfile nx=11 ny=11 problem=single
+./$outfile nx=100 ny=100 problem=double
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $outfile failed. Exiting."
@@ -32,3 +32,20 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo "Execution of $outfile successful."
+
+plotfile='temp_plotter.py'
+
+echo "Executing $plotfile"
+
+python3 $plotfile
+
+
+if [[ $? -ne 0 ]]; then
+    echo "Error: Execution of $plotfile failed. Exiting."
+    exit 1
+fi
+
+
+
+echo "Execution of $plotfile successful."
+echo "All tasks completed successfully."
