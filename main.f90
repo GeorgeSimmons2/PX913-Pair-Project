@@ -3,17 +3,20 @@ PROGRAM MAIN
     USE VERLET_MOD
     USE grid_initialisation
     USE NETCDF_WRITER
+    USE command_line
     IMPLICIT NONE
 
     TYPE(TRAJECTORY) :: trajectory_data
     TYPE(DIMENSIONS) :: dimension_data
-    INTEGER          :: n_x = 100, n_y = 100
+    INTEGER          :: n_x, n_y
     INTEGER(INT64)   :: steps = 1000, nx = 100, ny = 100, ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
-    CHARACTER(LEN=10):: problem = 'single', filename = 'traj.nc'
+    CHARACTER(LEN=10):: problem, filename = 'traj.nc'
     REAL(REAL64), DIMENSION(2) :: r_init = [0.1, 0.], v_init = [0., 0.]
     REAL(REAL64)     :: dt = 0.01
+    LOGICAL          :: arg
+
     dimension_data%steps = steps
     dimension_data%n_x = nx
     dimension_data%n_y = ny
@@ -21,6 +24,11 @@ PROGRAM MAIN
     dimension_data%n_y_name = 'y_axis'
     dimension_data%steps_name = 'Time'
 
+    CALL parse_args
+
+    arg = get_arg('nx', n_x)
+    arg = get_arg('ny', n_y)
+    arg = get_arg('problem', problem)
 
 
     CALL define_rho(rho, n_x, n_y, problem, dx, dy)
