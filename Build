@@ -1,16 +1,20 @@
 #!/bin/bash
 
-myprogramfiles="create_axis.f90 Gauss_Seidel_solver.f90 command_line.f90"
+myprogramfiles="create_axis.f90 Gauss_Seidel_solver.f90 command_line.f90 main.f90 Verlet.f90 netCDF_writer.f90"
 
 
-outfile="solve"
+outfile="trajectory_solver"
+
+fflags=`nf-config --fflags`
+flibs=`nf-config --flibs`
+
 
 
 fc=gfortran
 
 echo "Compiling $outfile"
 
-$fc -g -pg -std=f2008 $myprogramfiles -o $outfile
+$fc -g $fflags -std=f2008 $myprogramfiles  $flibs -o $outfile
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Compilation of $outfile failed. Exiting."
