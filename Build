@@ -37,7 +37,7 @@ fi
 
 echo "Execution of $outfile successful."
 
-plotfile='temp_plotter.py'
+plotfile="TrajectoryPlotter.py"
 
 echo "Executing $plotfile"
 
