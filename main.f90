@@ -40,6 +40,10 @@ PROGRAM MAIN
     ! handled as well as the end step i.e electron must be between -1 and 1 for 
     ! x and y.
 
+    ! TODO: Include the problem type selection, i.e correct initial conditions.
+
+    ! TODO: Include run data in the netCDF file, i.e number of steps, run file name, problem type, etc.
+
 
     CALL define_rho(rho, nx, ny, problem, dx, dy)
     CALL calc_potential(rho, phi, dx, dy)

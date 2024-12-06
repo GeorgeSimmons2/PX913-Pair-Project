@@ -58,6 +58,6 @@ echo "All tasks completed successfully."
 plot1="E_x.jpg"
 plot2="Trajectory.jpg"
 
-#code $plot
+code $plot1
 
 code $plot2
