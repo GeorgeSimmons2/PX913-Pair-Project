@@ -13,7 +13,7 @@ PROGRAM MAIN
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'
-    REAL(REAL64), DIMENSION(2) :: r_init = [0.1, 0.], v_init = [0.0, 0.0]
+    REAL(REAL64), DIMENSION(2) :: r_init = [0.1, 0.], v_init = [0., 0.]
     REAL(REAL64)     :: dt = 0.01
     LOGICAL          :: arg
 
