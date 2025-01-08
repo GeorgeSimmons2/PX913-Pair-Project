@@ -9,12 +9,12 @@ PROGRAM MAIN
     TYPE(TRAJECTORY) :: trajectory_data
     TYPE(DIMENSIONS) :: dimension_data
     INTEGER          :: nx, ny
-    INTEGER(INT64)   :: steps = 1000,ierr
+    INTEGER(INT64)   :: steps = 10000,ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'
-    REAL(REAL64), DIMENSION(2) :: r_init = [0.1, 0.], v_init = [0., 0.]
-    REAL(REAL64)     :: dt = 0.01
+    REAL(REAL64), DIMENSION(2) :: r_init,v_init
+    REAL(REAL64)     :: dt = 0.001
     LOGICAL          :: arg
 
     CALL parse_args
@@ -44,7 +44,7 @@ PROGRAM MAIN
 
     ! TODO: Include run data in the netCDF file, i.e number of steps, run file name, problem type, etc.
 
-
+    CALL Initial_Conditions(problem,r_init,v_init)
     CALL define_rho(rho, nx, ny, problem, dx, dy)
     CALL calc_potential(rho, phi, dx, dy)
     trajectory_data = VERLET(phi, r_init, v_init, dt, steps, INT(nx,INT64), INT(ny,INT64), dx, dy)

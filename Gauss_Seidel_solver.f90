@@ -5,6 +5,29 @@ MODULE grid_initialisation
 
     CONTAINS
     
+    
+    ! Sets up the initial conditions of the particle.
+    SUBROUTINE Initial_Conditions(problem,r_init,v_init)
+        CHARACTER(LEN=*), INTENT(OUT) :: problem
+        REAL(REAL64), DIMENSION(2) :: r_init,v_init
+        
+       
+
+
+        IF (problem == 'null') THEN
+            r_init = [0.0,0.0]
+            v_init = [0.1,0.1]
+        ELSE IF (problem == 'single') THEN
+            r_init = [0.1,0.0]
+            v_init = [0.0,0.0]
+        ELSE IF (problem == 'double') THEN
+            r_init = [0.0,0.5]
+            v_init = [0.0,0.0]
+        END IF
+
+
+    END SUBROUTINE
+
     ! Based on the sizes nx and ny and the type of problem,
     ! the subroutine creates the correct charge distribution 
     ! rho. The charge distribution values are defined as being in the 
@@ -237,7 +260,9 @@ MODULE grid_initialisation
      
         calc_error = error_tot/error_rms
     END FUNCTION
+    
 END MODULE
+
 
 
    
