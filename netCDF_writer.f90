@@ -26,15 +26,14 @@ MODULE NETCDF_WRITER
 
         ALLOCATE(rho_corrected(ny, nx))
         ALLOCATE(phi_corrected(ny, nx))
-        PRINT*,'DIMNESIONS:', nx, ny
+  
         DO i = 2, ny-1
             DO j = 2, nx-1
                 rho_corrected(i, j) = rho(i, j)
                 phi_corrected(i, j) = phi(i, j)
             END DO
         END DO
-        
-        PRINT*,SHAPE(rho_corrected),SHAPE(phi_corrected)
+    
         !We are allocating for storing each id number of the variables and dimensions we have
         ALLOCATE(dimension_ids(3))
         ALLOCATE(variable_ids(10))

@@ -31,22 +31,15 @@ PROGRAM MAIN
     dimension_data%steps_name = 'Time'
 
     
-    ! TODO: Change Writer so that it's valid for rectangular shapes
-    ! otherwise there is an error in the netCDF file.
-    
-    ! TODO: Discuss the Verlet method. It doesn't seem to update the 
-    ! positions accordingly and may need to change the way r_init is
-    ! handled as well as the end step i.e electron must be between -1 and 1 for 
-    ! x and y.
-
    
     ! TODO: Include run data in the netCDF file, i.e number of steps, run file name, problem type, etc.
 
+    ! TODO: Final finishing touches on the plotter file. 
     CALL Initial_Conditions(problem,r_init,v_init)
     CALL define_rho(rho, nx, ny, problem, dx, dy)
     CALL calc_potential(rho, phi, dx, dy)
 
-    PRINT*, SHAPE(rho), SHAPE(phi)
+ 
 
     trajectory_data = VERLET(phi, r_init, v_init, dt, steps, INT(nx,INT64), INT(ny,INT64), dx, dy)
     trajectory_data%x_name = 'x_trajectory'
