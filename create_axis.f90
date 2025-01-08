@@ -17,7 +17,7 @@ MODULE domain_tools
   SUBROUTINE create_axis(axis, nels, axis_range, nghosts, delta)
 
     REAL(REAL64), DIMENSION(:), ALLOCATABLE, INTENT(OUT) :: axis
-    INTEGER, INTENT(IN) :: nels
+    INTEGER(INT64), INTENT(IN) :: nels
     REAL(REAL64), DIMENSION(2), INTENT(IN) :: axis_range
     INTEGER, INTENT(IN), OPTIONAL :: nghosts
     REAL(REAL64), INTENT(OUT), OPTIONAL :: delta

@@ -7,13 +7,13 @@ MODULE NETCDF_WRITER
     IMPLICIT NONE
     
     TYPE :: DIMENSIONS
-        INTEGER(INT32)   :: n_x, n_y, steps
+        INTEGER(INT64)   :: n_x, n_y, steps
         CHARACTER(LEN=30) :: n_x_name, n_y_name, steps_name !These are just to give appropriate names to each dimension
     END TYPE
 
     CONTAINS
     
-    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, nx,ny)
+    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, nx, ny)
         TYPE(DIMENSIONS), INTENT(INOUT)                 :: dims
         TYPE(TRAJECTORY), INTENT(INOUT)                 :: particle_traj !Easiest to use derived type for all trajectories
         INTEGER(INT32)                                  :: file_id
@@ -42,14 +42,14 @@ MODULE NETCDF_WRITER
         PRINT *, ierr
 
         !Dimensions n_x_name and n_y_name are for the E-field variables
-        ierr = nf90_def_dim(file_id, dims%n_x_name, dims%n_x, dimension_ids(2))
+        ierr = nf90_def_dim(file_id, dims%n_x_name, INT(dims%n_x, kind=4), dimension_ids(2))
         PRINT *, ierr
 
-        ierr = nf90_def_dim(file_id, dims%n_y_name, dims%n_y, dimension_ids(1))
+        ierr = nf90_def_dim(file_id, dims%n_y_name, INT(dims%n_y, kind=4), dimension_ids(1))
         PRINT *, ierr
 
         !Dimension steps_name are for the trajectory variables
-        ierr = nf90_def_dim(file_id, dims%steps_name, dims%steps + 1, dimension_ids(3))
+        ierr = nf90_def_dim(file_id, dims%steps_name, INT(dims%steps + 1, kind=4), dimension_ids(3))
         PRINT *, ierr
 
         !Defining all our variables to store all trajectories, E-fields, charge densities and scalar fields

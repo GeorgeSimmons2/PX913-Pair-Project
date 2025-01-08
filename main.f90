@@ -8,8 +8,8 @@ PROGRAM MAIN
 
     TYPE(TRAJECTORY) :: trajectory_data
     TYPE(DIMENSIONS) :: dimension_data
-    INTEGER          :: nx, ny
-    INTEGER(INT64)   :: steps = 1000,ierr
+    INTEGER(INT64)   :: nx, ny
+    INTEGER(INT64)   :: steps = 1000, ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'

@@ -47,7 +47,7 @@ MODULE grid_initialisation
         INTEGER(INT64) :: x_dim,y_dim, i,j
         
         
-        INTEGER, INTENT(IN) :: nx,ny
+        INTEGER(INT64), INTENT(IN) :: nx,ny
         CHARACTER(LEN=10), INTENT(IN) :: problem
         
         REAL(REAL64), DIMENSION(2) :: pos
