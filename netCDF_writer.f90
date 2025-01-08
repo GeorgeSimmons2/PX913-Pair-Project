@@ -13,15 +13,16 @@ MODULE NETCDF_WRITER
 
     CONTAINS
     
-    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, nx, ny)
+    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, nx, ny, problem, r_init, v_init)
         TYPE(DIMENSIONS), INTENT(INOUT)                 :: dims
         TYPE(TRAJECTORY), INTENT(INOUT)                 :: particle_traj !Easiest to use derived type for all trajectories
         INTEGER(INT32)                                  :: file_id
         INTEGER(INT32), DIMENSION(:), ALLOCATABLE       :: dimension_ids, variable_ids
+        REAL(REAL64), DIMENSION(2), INTENT(IN)          :: r_init, v_init
         REAL(REAL64), DIMENSION(:, :), ALLOCATABLE      :: rho, phi, rho_corrected, phi_corrected
         INTENT(INOUT)                                   :: rho, phi
         INTEGER(INT64), INTENT(OUT)                     :: ierr
-        CHARACTER(LEN=*), INTENT(IN)                    :: filename
+        CHARACTER(LEN=*), INTENT(IN)                    :: filename, problem
         INTEGER(INT64)                                  :: i, j, nx,ny
 
         ALLOCATE(rho_corrected(ny, nx))
@@ -35,8 +36,8 @@ MODULE NETCDF_WRITER
         END DO
     
         !We are allocating for storing each id number of the variables and dimensions we have
-        ALLOCATE(dimension_ids(3))
-        ALLOCATE(variable_ids(10))
+        ALLOCATE(dimension_ids(4))
+        ALLOCATE(variable_ids(12))
 
         ierr = nf90_create(filename, NF90_CLOBBER, file_id)
         PRINT *, ierr
@@ -50,6 +51,10 @@ MODULE NETCDF_WRITER
 
         !Dimension steps_name are for the trajectory variables
         ierr = nf90_def_dim(file_id, dims%steps_name, INT(dims%steps + 1, kind=4), dimension_ids(3))
+        PRINT *, ierr
+
+        !Dimension steps_name are for the trajectory variables
+        ierr = nf90_def_dim(file_id, "Initial Conditions", INT(2, kind=4), dimension_ids(4))
         PRINT *, ierr
 
         !Defining all our variables to store all trajectories, E-fields, charge densities and scalar fields
@@ -83,7 +88,16 @@ MODULE NETCDF_WRITER
         ierr = nf90_def_var(file_id, particle_traj%phi_name, NF90_REAL, dimension_ids(1:2), variable_ids(10))
         PRINT *, ierr
 
-        !Also add attributes to variables/global
+        ierr = nf90_def_var(file_id, "Initial Position", NF90_REAL, dimension_ids(4), variable_ids(11))
+        PRINT *, ierr
+
+        ierr = nf90_def_var(file_id, "Initial Velocity", NF90_REAL, dimension_ids(4), variable_ids(12))
+        PRINT *, ierr
+
+        !Meta-data about the problem described by global attribute and two above variables
+        ierr = nf90_put_att(file_id, NF90_GLOBAL, "Problem", problem)
+        PRINT *, ierr
+
         ierr = nf90_enddef(file_id)
         PRINT *, ierr
 
@@ -115,7 +129,14 @@ MODULE NETCDF_WRITER
 
         ierr = nf90_put_var(file_id, variable_ids(9), rho_corrected)
         PRINT *, ierr
+
         ierr = nf90_put_var(file_id, variable_ids(10), phi_corrected)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(11), r_init)
+        PRINT *, ierr
+
+        ierr = nf90_put_var(file_id, variable_ids(12), v_init)
         PRINT *, ierr
 
         ierr = nf90_close(file_id)

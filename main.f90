@@ -53,6 +53,6 @@ PROGRAM MAIN
     trajectory_data%rho_name = 'Charge_density'
     trajectory_data%phi_name = 'Electric_potential'
 
-    CALL WRITER(trajectory_data, rho, phi, filename, dimension_data, ierr, INT(nx,INT64),INT(ny,INT64))
+    CALL WRITER(trajectory_data, rho, phi, filename, dimension_data, ierr, INT(nx,INT64),INT(ny,INT64), problem, r_init, v_init)
 
 END PROGRAM MAIN
