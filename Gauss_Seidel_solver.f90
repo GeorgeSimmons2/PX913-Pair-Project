@@ -11,7 +11,7 @@ MODULE grid_initialisation
         CHARACTER(LEN=*), INTENT(OUT) :: problem
         REAL(REAL64), DIMENSION(2) :: r_init,v_init
         
-       
+
 
 
         IF (problem == 'null') THEN
@@ -23,7 +23,11 @@ MODULE grid_initialisation
         ELSE IF (problem == 'double') THEN
             r_init = [0.0,0.5]
             v_init = [0.0,0.0]
+        ELSE
+            ERROR STOP 'INVALID PROBLEM. PLEASE CHOOSE FROM: null, single, double'
         END IF
+           
+        
 
 
     END SUBROUTINE
@@ -77,7 +81,7 @@ MODULE grid_initialisation
         ! Sets up the charge distribution based on the pre-defined problems.
         
         IF (problem == 'null') THEN 
-            
+            rho = 0.0_REAL64
         
         ELSE IF (problem == 'single') THEN
             ! Loops over the grid and sets the correct 
