@@ -72,7 +72,7 @@ MODULE grid_initialisation
        
         ! From above, could equivelantly have the limits as 
         ! 0:nx + 1 and similarly for y
-        ALLOCATE(rho(0:x_dim -1, 0 : y_dim-1))
+        ALLOCATE(rho(0:y_dim -1, 0 : x_dim-1))
 
         ! TODO: Trim the input to ensure that it matches.
         ! Check correctness of user input.
@@ -93,8 +93,8 @@ MODULE grid_initialisation
 
             rho = 0.0_REAL64
 
-            DO j=ny,1,-1
-                DO i=1,nx
+            DO i=ny,1,-1
+                DO j=1,nx
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
                     y = pos(2)
@@ -110,8 +110,8 @@ MODULE grid_initialisation
 
             rho = 0.0_REAL64
             
-            DO j=ny,1,-1
-                DO i=1,nx
+            DO i=ny,1,-1
+                DO j=1,nx
                     pos = position_converter(x_axis,y_axis,i,j)
                     x = pos(1)
                     y = pos(2)
@@ -141,21 +141,23 @@ MODULE grid_initialisation
         ! Need the -2 to account for the 2 ghost cells on each side of the grid.
         
        
-        nx = SIZE(rho(:,1)) -2
-        ny = SIZE(rho(1,:)) -2 
+        nx = SIZE(rho(1,:)) -2 
+        ny = SIZE(rho(:,1)) -2
 
-        ALLOCATE(phi(0:nx + 1,0:ny + 1))
-        
+     
+        ALLOCATE(phi(0:ny + 1,0:nx + 1))
+ 
+
         ! Assumes that our boundary conditions for the potoential are 0 at the
         ! edges. 
-        phi(0:nx +1,0:ny + 1) = 0.0_REAL64
+        phi(0:ny +1,0:nx + 1) = 0.0_REAL64
         
         counter = 0
         
         DO WHILE (loop_flag)
            
-              DO j=ny,1,-1
-                DO i=1,nx
+              DO i=ny,1,-1
+                DO j=1,nx
                     ! Implements the Gauss-Seidel algorithm as described in the pdf nootes
                     dphi_x = (phi(i+1,j) + phi(i-1,j))/(dx**2)
                     dphi_y = (phi(i,j+1) + phi(i,j-1))/(dy**2)
@@ -223,15 +225,15 @@ MODULE grid_initialisation
 
 
 
-        nx = SIZE(rho(:,1)) -2
-        ny = SIZE(rho(1,:)) -2
+        nx = SIZE(rho(1,:)) -2
+        ny = SIZE(rho(:,1)) -2
         
         error_tot = 0.0
         error_rms = 0.0
       
         ! Implements the total error as in the pdf notes.
-        DO j=ny,1,-1
-            DO i=1,nx
+        DO i=ny,1,-1
+            DO j=1,nx
                 error_tot = error_tot + ABS( -rho(i,j) & 
                 + (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2)  & 
                 + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))
@@ -240,8 +242,8 @@ MODULE grid_initialisation
         END DO
    
         ! Implements the RMS error as in the pdf notes.
-        DO j = ny,1,-1
-            DO i=1,nx
+        DO i = ny,1,-1
+            DO j=1,nx
                 error_rms = error_rms + ( (phi(i+1,j) -2.0_REAL64 * phi(i,j) + phi(i-1,j))/(dx**2) &
                 + (phi(i,j+1) - 2.0_REAL64 * phi(i,j)  + phi(i,j-1))/(dy**2))**2
              

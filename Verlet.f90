@@ -23,7 +23,7 @@ MODULE VERLET_MOD
         INTEGER(INT64) :: n_x, n_y, x_cell, y_cell, steps, i, j
         INTENT(IN) :: steps, n_x, n_y
         REAL(REAL64), INTENT(IN) :: dx, dy, dt
-        REAL(REAL64), DIMENSION(0:n_x+1, 0:n_y+1), INTENT(IN) :: gauss_seidel !(n_x+2)x(n_y+2) array of potentials (ghost nodes on boundaries)
+        REAL(REAL64), DIMENSION(0:n_y+1, 0:n_x+1), INTENT(IN) :: gauss_seidel !(n_x+2)x(n_y+2) array of potentials (ghost nodes on boundaries)
         REAL(REAL64), DIMENSION(2), INTENT(IN) :: r_init, v_init
         TYPE(TRAJECTORY) :: particle_traj
         
@@ -49,6 +49,7 @@ MODULE VERLET_MOD
                 particle_traj%E_y(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j) / (2 * dx))
             END DO
         END DO
+
 
         !Initialise acceleration now using cell corresponding to E-field cell we are starting in
         x_cell = FLOOR((r_init(1) - 1.0) / dx) + 1 !This equation and future uses are from the briefing sheet (credit to C Brady & H Ratcliffe)

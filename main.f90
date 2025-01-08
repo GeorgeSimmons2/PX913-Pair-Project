@@ -9,7 +9,7 @@ PROGRAM MAIN
     TYPE(TRAJECTORY) :: trajectory_data
     TYPE(DIMENSIONS) :: dimension_data
     INTEGER          :: nx, ny
-    INTEGER(INT64)   :: steps = 10000,ierr
+    INTEGER(INT64)   :: steps = 1000,ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'
@@ -45,7 +45,9 @@ PROGRAM MAIN
     CALL Initial_Conditions(problem,r_init,v_init)
     CALL define_rho(rho, nx, ny, problem, dx, dy)
     CALL calc_potential(rho, phi, dx, dy)
-    
+
+    PRINT*, SHAPE(rho), SHAPE(phi)
+
     trajectory_data = VERLET(phi, r_init, v_init, dt, steps, INT(nx,INT64), INT(ny,INT64), dx, dy)
     trajectory_data%x_name = 'x_trajectory'
     trajectory_data%y_name = 'y_trajectory'
@@ -58,6 +60,6 @@ PROGRAM MAIN
     trajectory_data%rho_name = 'Charge_density'
     trajectory_data%phi_name = 'Electric_potential'
 
-    CALL WRITER(trajectory_data, rho, phi, filename, dimension_data, ierr, INT(nx,INT64))
+    CALL WRITER(trajectory_data, rho, phi, filename, dimension_data, ierr, INT(nx,INT64),INT(ny,INT64))
 
 END PROGRAM MAIN

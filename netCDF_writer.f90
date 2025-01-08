@@ -13,7 +13,7 @@ MODULE NETCDF_WRITER
 
     CONTAINS
     
-    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, N)
+    SUBROUTINE WRITER(particle_traj, rho, phi, filename, dims, ierr, nx,ny)
         TYPE(DIMENSIONS), INTENT(INOUT)                 :: dims
         TYPE(TRAJECTORY), INTENT(INOUT)                 :: particle_traj !Easiest to use derived type for all trajectories
         INTEGER(INT32)                                  :: file_id
@@ -22,18 +22,19 @@ MODULE NETCDF_WRITER
         INTENT(INOUT)                                   :: rho, phi
         INTEGER(INT64), INTENT(OUT)                     :: ierr
         CHARACTER(LEN=*), INTENT(IN)                    :: filename
-        INTEGER(INT64)                                  :: i, j, N
+        INTEGER(INT64)                                  :: i, j, nx,ny
 
-        ALLOCATE(rho_corrected(N, N))
-        ALLOCATE(phi_corrected(N, N))
-
-        DO i = 2, N-1
-            DO j = 2, N-1
+        ALLOCATE(rho_corrected(ny, nx))
+        ALLOCATE(phi_corrected(ny, nx))
+        PRINT*,'DIMNESIONS:', nx, ny
+        DO i = 2, ny-1
+            DO j = 2, nx-1
                 rho_corrected(i, j) = rho(i, j)
                 phi_corrected(i, j) = phi(i, j)
             END DO
         END DO
-
+        
+        PRINT*,SHAPE(rho_corrected),SHAPE(phi_corrected)
         !We are allocating for storing each id number of the variables and dimensions we have
         ALLOCATE(dimension_ids(3))
         ALLOCATE(variable_ids(10))
@@ -42,10 +43,10 @@ MODULE NETCDF_WRITER
         PRINT *, ierr
 
         !Dimensions n_x_name and n_y_name are for the E-field variables
-        ierr = nf90_def_dim(file_id, dims%n_x_name, dims%n_x, dimension_ids(1))
+        ierr = nf90_def_dim(file_id, dims%n_x_name, dims%n_x, dimension_ids(2))
         PRINT *, ierr
 
-        ierr = nf90_def_dim(file_id, dims%n_y_name, dims%n_y, dimension_ids(2))
+        ierr = nf90_def_dim(file_id, dims%n_y_name, dims%n_y, dimension_ids(1))
         PRINT *, ierr
 
         !Dimension steps_name are for the trajectory variables
@@ -115,7 +116,6 @@ MODULE NETCDF_WRITER
 
         ierr = nf90_put_var(file_id, variable_ids(9), rho_corrected)
         PRINT *, ierr
-
         ierr = nf90_put_var(file_id, variable_ids(10), phi_corrected)
         PRINT *, ierr
 
