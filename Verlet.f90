@@ -63,8 +63,8 @@ MODULE VERLET_MOD
                                      + 0.5 * particle_traj%ax_traj(i - 1) * dt ** 2
             particle_traj%y_traj(i)  = particle_traj%y_traj(i - 1) + particle_traj%vy_traj(i - 1) * dt &
                                      + 0.5 * particle_traj%ay_traj(i - 1) * dt ** 2
-            x_cell = ABS(FLOOR((particle_traj%x_traj(i) - 1.0) / dx) + 1)
-            y_cell = ABS(FLOOR((particle_traj%y_traj(i) - 1.0) / dy) + 1)
+            x_cell = FLOOR((particle_traj%x_traj(i) - 1.0) / dx) + n_x
+            y_cell = FLOOR((particle_traj%y_traj(i) - 1.0) / dy) + n_y
             !We do not want the particle going outside the bounds of the box, so if this occurs we will keep it at its final
             !postition and velocity with this if statement
             IF (particle_traj%x_traj(i) > 1 .OR. particle_traj%x_traj(i) < - 1. .OR. particle_traj%y_traj(i) > 1 .OR. &
