@@ -45,8 +45,8 @@ MODULE VERLET_MOD
         !Obtaining the electric field so we can calculate accelerations
         DO i = 1, n_y
             DO j = 1, n_x
-                particle_traj%E_x(i, j) = (gauss_seidel(i, j + 1) - gauss_seidel(i, j - 1) / (2 * dy))
-                particle_traj%E_y(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j) / (2 * dx))
+                particle_traj%E_x(i, j) = (gauss_seidel(i, j + 1) - gauss_seidel(i, j - 1)) / (2 * dy)
+                particle_traj%E_y(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j)) / (2 * dx)
             END DO
         END DO
 
