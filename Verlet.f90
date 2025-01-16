@@ -45,17 +45,17 @@ MODULE VERLET_MOD
         !Obtaining the electric field so we can calculate accelerations
         DO i = 1, n_y
             DO j = 1, n_x
-                particle_traj%E_x(i, j) = (gauss_seidel(i, j + 1) - gauss_seidel(i, j - 1)) / (2 * dy)
-                particle_traj%E_y(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j)) / (2 * dx)
+                particle_traj%E_y(i, j) = (gauss_seidel(i, j + 1) - gauss_seidel(i, j - 1)) / (2 * dy)
+                particle_traj%E_x(i, j) = (gauss_seidel(i + 1, j) - gauss_seidel(i - 1, j)) / (2 * dx)
             END DO
         END DO
 
 
         !Initialise acceleration now using cell corresponding to E-field cell we are starting in
-        x_cell = FLOOR((r_init(1) - 1.0) / dx) + n_x !This equation and future uses are from the briefing sheet (credit to C Brady & H Ratcliffe)
-        y_cell = FLOOR((r_init(2) - 1.0) / dy) + n_y
-        particle_traj%ax_traj(0) = - 1. * particle_traj%E_x(y_cell, x_cell)
-        particle_traj%ay_traj(0) = - 1. * particle_traj%E_y(y_cell, x_cell)
+        x_cell = FLOOR((r_init(1) + 1.0) / dx)  !This equation and future uses are from the briefing sheet (credit to C Brady & H Ratcliffe)
+        y_cell = FLOOR((r_init(2) + 1.0) / dy) 
+        particle_traj%ax_traj(0) = - 1. * particle_traj%E_x(x_cell, y_cell)
+        particle_traj%ay_traj(0) = - 1. * particle_traj%E_y(x_cell, y_cell)
         
         !Verlet algorithm
         DO i = 1, steps
@@ -63,8 +63,8 @@ MODULE VERLET_MOD
                                      + 0.5 * particle_traj%ax_traj(i - 1) * dt ** 2
             particle_traj%y_traj(i)  = particle_traj%y_traj(i - 1) + particle_traj%vy_traj(i - 1) * dt &
                                      + 0.5 * particle_traj%ay_traj(i - 1) * dt ** 2
-            x_cell = FLOOR((particle_traj%x_traj(i) - 1.0) / dx) + n_x
-            y_cell = FLOOR((particle_traj%y_traj(i) - 1.0) / dy) + n_y
+            x_cell = FLOOR((particle_traj%x_traj(i) + 1.0) / dx)
+            y_cell = FLOOR((particle_traj%y_traj(i) + 1.0) / dy)
             !We do not want the particle going outside the bounds of the box, so if this occurs we will keep it at its final
             !postition and velocity with this if statement
             IF (particle_traj%x_traj(i) > 1 .OR. particle_traj%x_traj(i) < - 1. .OR. particle_traj%y_traj(i) > 1 .OR. &
@@ -77,8 +77,9 @@ MODULE VERLET_MOD
                     particle_traj%ay_traj(i:) = particle_traj%ay_traj(i - 1)
                     EXIT
             END IF
-            particle_traj%ax_traj(i) = -1. * particle_traj%E_x(y_cell, x_cell)
-            particle_traj%ay_traj(i) = -1. * particle_traj%E_y(y_cell, x_cell)
+            particle_traj%ax_traj(i) = -1. * particle_traj%E_x(x_cell, y_cell)
+
+            particle_traj%ay_traj(i) = -1. * particle_traj%E_y(x_cell, y_cell)
             particle_traj%vx_traj(i) = particle_traj%vx_traj(i - 1) + dt * (particle_traj%ax_traj(i) &
                                      + particle_traj%ax_traj(i - 1)) / 2
             particle_traj%vy_traj(i) = particle_traj%vy_traj(i - 1) + dt * (particle_traj%ay_traj(i) &
