@@ -28,7 +28,7 @@ echo "Compilation of $outfile successful."
 echo "Executing $outfile"
 
 
-./$outfile nx=100 ny=100 problem=single
+./$outfile nx=100 ny=100 problem=double
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $outfile failed. Exiting."

@@ -79,12 +79,12 @@ plt.close()
 
 
 
-plt.plot(x,y,'x',color = 'k',markersize = 1,linestyle = 'dotted',label = '$r_{init}=$' +f'{r_init}'+ ' $v_{init} = $' + f'{v_init})')
+plt.scatter(x,y,color = 'k',marker = '.',label = '$r_{init}=$' +f'{r_init}'+ ' $v_{init} = $' + f'{v_init})', s=[np.ones(len(y))])
 plt.xlabel('X (arb. units)',fontsize= 12)
 plt.ylabel('Y (arb. units)',fontsize= 12)
 plt.grid()
 plt.legend(fancybox=True, framealpha=1, shadow=True, borderpad=1,fontsize = 10)
-plt.gca().set_aspect('equal')
+# plt.gca().set_aspect('equal')
 plt.tick_params(axis='both', which='major', labelsize=12, width=2)
 plt.tick_params(axis='both', which='minor', length=4, color='k')
 plt.title(f'Trajectory of a Particle for problem: {problem}',fontsize = 15)
