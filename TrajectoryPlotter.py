@@ -40,7 +40,6 @@ plt.close()
 
 
 
-
 nx = len(E_x[0])
 ny = len(E_x[:,0])
 
