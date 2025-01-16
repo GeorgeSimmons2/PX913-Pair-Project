@@ -7,13 +7,22 @@ dataset = netCDF4.Dataset('traj.nc')
 
 # line taken from the lecture 7
 
-print('File contains the following variables: ')
-for n, el in enumerate(dataset.variables.keys()):
-    print(n, ': ', el)
-    #print(dataset[el][:])
 
+
+print('The file contains the following variables: ')
+for n, el in enumerate(dataset.variables.keys(),start = 1):
+    print(n, ': ', el)
+
+print('\n\nThe file contains the following attributes: ')
+for n,attr in enumerate(dataset.ncattrs(),start=1):
+    print(n,':',attr,'=',dataset.getncattr(attr))
+
+problem = dataset.getncattr('Problem')
 
 E_x  = dataset['x_Electric_field'][:]
+
+r_init = tuple(dataset['Initial Position'][:])
+v_init = tuple(dataset['Initial Velocity'][:])
 
 
 
@@ -62,7 +71,7 @@ cb.ax.tick_params(labelsize=10)
 plt.xlabel('X (arb. units)',fontsize= 12)
 plt.ylabel('Y (arb. units)',fontsize= 12)
 
-plt.title('Electric Field in X direction',fontsize = 15)
+plt.title(f'Electric Field in X direction for problem: {problem}',fontsize = 15)
 
 plt.savefig('E_x.jpg',dpi = 600)
 plt.close()
@@ -71,7 +80,7 @@ plt.close()
 
 
 
-plt.plot(x,y,'x',color = 'k',markersize = 1,linestyle = 'dotted',label = '$r_{init}$ = (0,0), $v_{init} = (0,0)$')
+plt.plot(x,y,'x',color = 'k',markersize = 1,linestyle = 'dotted',label = '$r_{init}=$' +f'{r_init}'+ ' $v_{init} = $' + f'{v_init})')
 plt.xlabel('X (arb. units)',fontsize= 12)
 plt.ylabel('Y (arb. units)',fontsize= 12)
 plt.grid()
@@ -79,7 +88,7 @@ plt.legend(fancybox=True, framealpha=1, shadow=True, borderpad=1,fontsize = 10)
 plt.gca().set_aspect('equal')
 plt.tick_params(axis='both', which='major', labelsize=12, width=2)
 plt.tick_params(axis='both', which='minor', length=4, color='k')
-plt.title('Trajectory of a Particle for problem: ',fontsize = 15)
+plt.title(f'Trajectory of a Particle for problem: {problem}',fontsize = 15)
 plt.minorticks_on()
 
 plt.savefig('Trajectory.jpg',dpi = 600)
