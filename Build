@@ -13,51 +13,49 @@ flibs=`nf-config --flibs`
 fc=gfortran
 
 echo "Compiling $outfile"
-
+echo
 $fc -g $fflags -std=f2008 $myprogramfiles  $flibs -o $outfile
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Compilation of $outfile failed. Exiting."
+    echo
     exit 1
 fi
 
 
 echo "Compilation of $outfile successful."
-
+echo
 
 echo "Executing $outfile"
-
+echo
 
 ./$outfile nx=100 ny=100 problem=double
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $outfile failed. Exiting."
+    echo
     exit 1
 fi
 
 echo "Execution of $outfile successful."
+echo
 
 plotfile="TrajectoryPlotter.py"
 
 echo "Executing $plotfile"
+echo 
 
 python3 $plotfile
 
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $plotfile failed. Exiting."
+    echo
     exit 1
 fi
 
 
 
 echo "Execution of $plotfile successful."
-echo "All tasks completed successfully."
-
-
-plot1="E_x.jpg"
-plot2="Trajectory.jpg"
-
-code $plot1
-
-code $plot2
+echo
+echo "All tasks completed successfully!"

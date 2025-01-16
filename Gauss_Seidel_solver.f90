@@ -1,16 +1,19 @@
 MODULE grid_initialisation
     USE ISO_FORTRAN_ENV
     USE domain_tools
+    USE IEEE_ARITHMETIC
     IMPLICIT NONE
 
     CONTAINS
     
     
-    ! Sets up the initial conditions of the particle.
-    SUBROUTINE Initial_Conditions(problem,r_init,v_init)
-        CHARACTER(LEN=*), INTENT(OUT) :: problem
+    ! Sets up the initial conditions of the particle as well as checks
+    ! the validity of the user inputs.
+    
+    SUBROUTINE check_user_inputs(problem,r_init,v_init,nx,ny)
+        CHARACTER(LEN=*), INTENT(IN) :: problem
         REAL(REAL64), DIMENSION(2) :: r_init,v_init
-        
+        INTEGER(INT64), INTENT(IN) :: nx,ny
 
 
 
@@ -18,17 +21,31 @@ MODULE grid_initialisation
             r_init = [0.0,0.0]
             v_init = [0.1,0.1]
         ELSE IF (problem == 'single') THEN
+           
             r_init = [0.1,0.0]
             v_init = [0.0,0.0]
         ELSE IF (problem == 'double') THEN
             r_init = [0.0,0.5]
             v_init = [0.0,0.0]
         ELSE
-            ERROR STOP 'INVALID PROBLEM. PLEASE CHOOSE FROM: null, single, double'
+          
+            ERROR STOP ': INVALID PROBLEM. PLEASE CHOOSE FROM: null, single, double'
         END IF
-           
         
 
+
+        IF (nx .le. 0) THEN
+            ERROR STOP ': INVALID GRID SIZE. PLEASE CHOOSE A POSITIVE INTEGER FOR nx'
+        END IF
+        
+        IF (ny .le. 0) THEN
+            ERROR STOP ': INVALID GRID SIZE. PLEASE CHOOSE A POSITIVE INTEGER FOR ny'
+        END IF
+
+        IF (nx .ne. ny) THEN
+            PRINT*, 'WARNING! I MAY RUN CORRECTLY AND IF I DO, I WILL GIVE A NONSENSICAL RESULT. PLEASE CHOOSE nx = ny'
+            PRINT*, ''
+        END IF
 
     END SUBROUTINE
 
@@ -146,8 +163,8 @@ MODULE grid_initialisation
 
      
         ALLOCATE(phi(0:ny + 1,0:nx + 1))
- 
 
+       
         ! Assumes that our boundary conditions for the potoential are 0 at the
         ! edges. 
         phi(0:ny +1,0:nx + 1) = 0.0_REAL64
@@ -168,8 +185,15 @@ MODULE grid_initialisation
             END DO
            
             error = calc_error(rho,phi,dx,dy)
-            
+        
             counter = counter + 1
+            
+            IF (IEEE_IS_NAN(error) .OR. counter > 1E5)  THEN
+                ERROR STOP ': THE ALGORITHM HAS NOT CONVERGED. PLEASE CHECK nx & ny'
+            END IF 
+                
+
+
 
             ! Uses the same error tolerance as in the pdf notes.
             IF (error < 10E-5) THEN
@@ -251,16 +275,15 @@ MODULE grid_initialisation
         END DO
         
 
-        ! Either error, may be 0. This is the case when there is no charge denisty,
+        ! Either error may be 0. This is the case when there is no charge denisty,
         ! and the second derivatives of the potential dissappear. However, there still is 
         ! a potential, as well as its first derivatives. Only need to handle the rms, since
         ! it is in the denominator of the error calculation. 
-      
+        
 
         IF (error_rms <10E-14) THEN 
             error_rms = 1.0
         END IF
-
 
         error_rms = SQRT(error_rms/(nx * ny))
      

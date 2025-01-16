@@ -9,7 +9,8 @@ PROGRAM MAIN
     TYPE(TRAJECTORY) :: trajectory_data
     TYPE(DIMENSIONS) :: dimension_data
     INTEGER(INT64)   :: nx, ny
-    INTEGER(INT64)   :: steps = 1000, ierr
+    INTEGER(INT64)   :: steps = 1000
+    INTEGER          :: ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'
@@ -19,10 +20,13 @@ PROGRAM MAIN
 
     CALL parse_args
 
+
     arg = get_arg('nx', nx)
     arg = get_arg('ny', ny)
     arg = get_arg('problem', problem)
-
+    
+    CALL check_user_inputs(problem,r_init,v_init,nx,ny)
+    
     dimension_data%steps = steps
     dimension_data%n_x = nx
     dimension_data%n_y = ny
@@ -31,15 +35,9 @@ PROGRAM MAIN
     dimension_data%steps_name = 'Time'
 
     
-   
-    ! TODO: Include run data in the netCDF file, i.e number of steps, run file name, problem type, etc.
-
-    ! TODO: Final finishing touches on the plotter file. 
-    CALL Initial_Conditions(problem,r_init,v_init)
     CALL define_rho(rho, nx, ny, problem, dx, dy)
     CALL calc_potential(rho, phi, dx, dy)
 
- 
 
     trajectory_data = VERLET(phi, r_init, v_init, dt, steps, INT(nx,INT64), INT(ny,INT64), dx, dy)
     trajectory_data%x_name = 'x_trajectory'
