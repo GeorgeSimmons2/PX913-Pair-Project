@@ -10,7 +10,7 @@ PROGRAM MAIN
     TYPE(DIMENSIONS) :: dimension_data
     INTEGER(INT64)   :: nx, ny
     INTEGER(INT64)   :: steps = 1000
-    INTEGER          :: ierr
+    INTEGER(INT32)   :: ierr
     REAL(REAL64), DIMENSION(:, :), ALLOCATABLE :: rho, phi
     REAL(REAL64)     :: dx, dy
     CHARACTER(LEN=10):: problem, filename = 'traj.nc'

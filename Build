@@ -29,7 +29,7 @@ echo
 echo "Executing $outfile"
 echo
 
-./$outfile nx=100 ny=100 problem=double
+./$outfile nx=100 ny=100 problem=single
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $outfile failed. Exiting."
