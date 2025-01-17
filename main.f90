@@ -1,7 +1,7 @@
 PROGRAM MAIN
     USE ISO_FORTRAN_ENV
-    USE VERLET_MOD
     USE grid_initialisation
+    USE VERLET_MOD
     USE NETCDF_WRITER
     USE command_line
     IMPLICIT NONE

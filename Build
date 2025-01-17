@@ -1,6 +1,6 @@
 #!/bin/bash
 
-myprogramfiles="create_axis.f90 Gauss_Seidel_solver.f90 command_line.f90 main.f90 Verlet.f90 netCDF_writer.f90"
+myprogramfiles="create_axis.f90 Gauss_Seidel_solver.f90 command_line.f90 Verlet.f90 netCDF_writer.f90 main.f90"
 
 
 outfile="trajectory_solver"
@@ -29,7 +29,7 @@ echo
 echo "Executing $outfile"
 echo
 
-./$outfile nx=100 ny=100 problem=single
+./$outfile nx=100 ny=100 problem=double
 
 if [[ $? -ne 0 ]]; then
     echo "Error: Execution of $outfile failed. Exiting."
